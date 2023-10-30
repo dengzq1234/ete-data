@@ -7,13 +7,17 @@ They include data such as big example files and GTDB taxonomy data.
 
 ## How to create the gtdb-dump files
 
-To create the `gtdbdump.tar.gz` files in
-[gtdb_taxonomy](gtdb_taxonomy), we first get the archea and bacteria
-data from https://data.gtdb.ecogenomic.org/releases/latest/ (for
-example,
+The data in the `gtdb*dump.tar.gz` files in the
+[gtdb_taxonomy](gtdb_taxonomy) directory come from the [Genome
+Taxonomy Database](https://gtdb.ecogenomic.org/).
+
+To create them, we first get the archea and bacteria taxonomies from
+[their releases](https://data.gtdb.ecogenomic.org/releases/) (for
+example, for the [latest
+release](https://data.gtdb.ecogenomic.org/releases/latest),
 [ar53_taxonomy](https://data.gtdb.ecogenomic.org/releases/latest/ar53_taxonomy.tsv.gz)
 and
-[bac120_taxonomy](https://data.gtdb.ecogenomic.org/releases/latest/bac120_taxonomy.tsv.gz).
+[bac120_taxonomy](https://data.gtdb.ecogenomic.org/releases/latest/bac120_taxonomy.tsv.gz)).
 
 Then, we use Nick Youngblut's
 [gtdb_to_taxdump](https://github.com/nick-youngblut/gtdb_to_taxdump)
@@ -25,7 +29,7 @@ NCBI taxdump format. To do it, we run:
 gtdb_to_taxdump.py ar53_taxonomy.tsv.gz bac120_taxonomy.tsv.gz
 ```
 
-and then just put the 4 resulting `.dpm` files into a tar.gz:
+and then we just put the 4 resulting `.dmp` files into a tar.gz:
 
 ```sh
 tar -cfz gtdb_latest_dump.tar.gz *.dmp
