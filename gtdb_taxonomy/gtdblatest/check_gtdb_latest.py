@@ -19,10 +19,10 @@ def main():
     print('Checking status of files', fnames, '...')
 
     try:
-        md5s = get_md5s()
+        md5s_web = get_md5s()
         for fname in fnames:
             md5 = hashlib.md5(open(fname, 'rb').read()).hexdigest()
-            print(f'  %22s is up-to-date: %s' % (fname, md5 == md5s[fname]))
+            print(f'  %22s is up-to-date: %s' % (fname, md5 == md5s_web[fname]))
     except (requests.exceptions.ConnectionError, KeyboardInterrupt,
             FileNotFoundError, ValueError) as e:
         sys.exit(f'Cannot check status: {e}')
