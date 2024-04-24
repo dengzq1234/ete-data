@@ -1,6 +1,6 @@
 This folder contains the GTDB taxonomy data in different historical
 releases, ready for use with Ete (see also [its
-documentation](https://etetoolkit.github.io/ete/tutorial/tutorial_taxonomy.html#id3)
+documentation](https://etetoolkit.github.io/ete/tutorial/tutorial_taxonomy.html)
 for more details).
 
 
