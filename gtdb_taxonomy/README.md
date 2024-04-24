@@ -1,8 +1,3 @@
-
-The data in the  files in the
-[gtdb_taxonomy](gtdb_taxonomy) directory  For more
-information, check [gtdb_taxonomy/README.md](gtdb_taxonomy/README.md).
-
 This folder contains `gtdb*dump.tar.gz` files coming from the [Genome
 Taxonomy Database](https://gtdb.ecogenomic.org/), ready for use with
 Ete (see also [Ete's
