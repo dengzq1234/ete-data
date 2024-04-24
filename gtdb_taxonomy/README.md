@@ -1,10 +1,16 @@
-This folder contains the GTDB taxonomy data in different historical
-releases, ready for use with Ete (see also [its
+
+The data in the  files in the
+[gtdb_taxonomy](gtdb_taxonomy) directory  For more
+information, check [gtdb_taxonomy/README.md](gtdb_taxonomy/README.md).
+
+This folder contains `gtdb*dump.tar.gz` files coming from the [Genome
+Taxonomy Database](https://gtdb.ecogenomic.org/), ready for use with
+Ete (see also [Ete's
 documentation](https://etetoolkit.github.io/ete/tutorial/tutorial_taxonomy.html)
 for more details).
 
 
-## How to create them
+## How to create the tar.gz files
 
 To create the `gtdb*dump.tar.gz` files, we first get the archea and
 bacteria taxonomies from [their releases](https://data.gtdb.ecogenomic.org/releases/)
