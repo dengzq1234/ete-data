@@ -4,8 +4,8 @@
 Simple script to check if the taxonomy files are up-to-date with the
 latest in GTDB.
 
-See https://github.com/etetoolkit/ete-data/blob/main/README.md for
-information on how to update gtdb_latest_dump.tar.gz if you need to.
+See https://github.com/etetoolkit/ete-data/blob/main/gtdb_taxonomy/README.md
+for information on how to update gtdb_latest_dump.tar.gz if you need to.
 """
 
 import sys
