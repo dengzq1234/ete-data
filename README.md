@@ -29,5 +29,5 @@ gtdb_to_taxdump.py ar53_taxonomy.tsv.gz bac120_taxonomy.tsv.gz
 and then we just put the 4 resulting `.dmp` files into a tar.gz:
 
 ```sh
-tar -cfz gtdb_latest_dump.tar.gz *.dmp
+tar -czf gtdb_latest_dump.tar.gz *.dmp
 ```
