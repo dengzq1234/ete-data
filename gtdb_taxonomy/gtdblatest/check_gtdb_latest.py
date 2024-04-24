@@ -23,6 +23,8 @@ def main():
         for fname in fnames:
             md5 = hashlib.md5(open(fname, 'rb').read()).hexdigest()
             print(f'  %22s is up-to-date: %s' % (fname, md5 == md5s_web[fname]))
+    except KeyError as e:
+        sys.exit(f'Cannot find mention of file: {e}')
     except (requests.exceptions.ConnectionError, KeyboardInterrupt,
             FileNotFoundError, ValueError) as e:
         sys.exit(f'Cannot check status: {e}')
