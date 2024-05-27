@@ -99,7 +99,7 @@ def read_nodes(tar):
     children = {}
     for line in tar.extractfile('nodes.dmp'):
         tid, ptid, *rest = [x.strip() for x in line.decode().split('|')]
-        nodes[tid] = [ptid] + rest
+        nodes[tid] = [ptid] + rest[:-1]
         if ptid:  # parent taxa id
             children.setdefault(ptid, set()).add(tid)
 
@@ -133,7 +133,7 @@ def write_nodes(nodes, needed):
     print('Writing nodes.dmp ...')
     with open('nodes.dmp', 'wt') as fnodes:
         for tid in needed:
-            fnodes.write('\t|\t'.join([tid] + nodes[tid]) + '\n')
+            fnodes.write('\t|\t'.join([tid] + nodes[tid]) + '\t|\n')
 
 
 def read_names(tar):
@@ -142,7 +142,7 @@ def read_names(tar):
     names = {}
     for line in tar.extractfile('names.dmp'):
         tid, *rest = [x.strip() for x in line.decode().split('|')]
-        names.setdefault(tid, []).append(rest)
+        names.setdefault(tid, []).append(rest[:-1])
 
     return names
 
@@ -153,7 +153,7 @@ def write_names(names, needed):
     with open('names.dmp', 'wt') as fnames:
         for tid in needed:
             for results in names[tid]:
-                fnames.write('\t|\t'.join([tid] + results) + '\n')
+                fnames.write('\t|\t'.join([tid] + results) + '\t|\n')
 
 
 def create_tar(fname):
