@@ -125,7 +125,7 @@ def find_needed(nodes, children, tids):
             extending |= ch
             needed |= ch
 
-    return sorted(needed)  # so they appear in order
+    return sorted(needed, key=int)  # so they appear in order
 
 
 def write_nodes(nodes, needed):
