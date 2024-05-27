@@ -8,6 +8,7 @@ This allows the related ete tests (like tests/test_ncbiquery.py) to go fast,
 and the user does not have to download big files just to run them.
 """
 
+import sys
 import os
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter as fmt
 import tarfile
@@ -16,25 +17,37 @@ import tarfile
 def main():
     args = get_args()
 
+    if not os.path.exists(args.src):
+        url = 'https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz'
+        sys.exit(f'Missing {args.src} -- you can download it from {url}')
+
     tar = tarfile.open(args.src)
 
     # Merged taxa ids.
     merged = read_merged(tar)
+    if not args.overwrite:
+        check_if_exists('merged.dmp')
     write_merged(merged, args.tids)
 
     # Update taxa ids, replacing the merged ones.
-    tids = sorted(merged.get(tid, tid) for tid in args.tids)
+    tids = [merged.get(tid, tid) for tid in args.tids]
 
     # Nodes content, and needed taxa ids.
     nodes, children = read_nodes(tar)
     needed = find_needed(nodes, children, tids)
+    if not args.overwrite:
+        check_if_exists('nodes.dmp')
     write_nodes(nodes, needed)
 
     # Names corresponding to taxa ids.
     names = read_names(tar)
+    if not args.overwrite:
+        check_if_exists('names.dmp')
     write_names(names, needed)
 
     # Final small taxa dump.
+    if not args.overwrite:
+        check_if_exists(args.dest)
     create_tar(args.dest)
     print('Done. You can remove nodes.dmp names.dmp merged.dmp if you want.')
 
@@ -54,6 +67,7 @@ def get_args():
     add('--tids', metavar='ID', nargs='+', help='taxa ids to include',
         default=['9604', '9605', '9606', '649756', '7507', '678',
                  '42099', '9443', '9598', '10090'])
+    add('--overwrite', action='store_true', help='overwrite files (skip checks)')
 
     return parser.parse_args()
 
@@ -146,6 +160,15 @@ def create_tar(fname):
     """Put it all in the given filename."""
     print(f'Creating {fname} ...')
     os.system(f'tar -vczf {fname} merged.dmp nodes.dmp names.dmp')
+
+
+def check_if_exists(fname):
+    if os.path.exists(fname):
+        try:
+            answer = input('File %s already exists. Overwrite? [y/n] ' % fname)
+            assert answer.lower().startswith('y')
+        except (KeyboardInterrupt, AssertionError):
+            sys.exit('\nCancelling.')
 
 
 
