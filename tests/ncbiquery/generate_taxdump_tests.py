@@ -165,9 +165,9 @@ def create_tar(fname):
 def check_if_exists(fname):
     if os.path.exists(fname):
         try:
-            answer = input('File %s already exists. Overwrite? [y/n] ' % fname)
+            answer = input(f'File {fname} already exists. Overwrite? [y/n] ')
             assert answer.lower().startswith('y')
-        except (KeyboardInterrupt, AssertionError):
+        except (KeyboardInterrupt, EOFError, AssertionError):
             sys.exit('\nCancelling.')
 
 
