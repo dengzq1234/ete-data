@@ -128,11 +128,9 @@ def find_needed(nodes, children, tids):
     # Add tids and all their ancestors.
     needed = {'1'}  # all the taxa ids that we need to get to our tids
     for tid in tids:
-        while True:
+        while tid not in needed:  # keep adding ids until we find a saved one
             needed.add(tid)
-            tid = nodes[tid][0]
-            if tid in needed:
-                break
+            tid = nodes[tid][0]  # go to its parent taxa id
 
     # Add all descendants.
     extending = set(tids)
