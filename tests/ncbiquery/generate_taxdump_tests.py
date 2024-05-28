@@ -21,35 +21,49 @@ def main():
         url = 'https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz'
         sys.exit(f'Missing {args.src} -- you can download it from {url}')
 
+    print('Using full taxdump file:', args.src)
     tar = tarfile.open(args.src)
 
+    print('Taxa ids to include:', ' '.join(args.tids))
+
     # Merged taxa ids.
+    print('Reading all merged ids...')
     merged = read_merged(tar)
+
     if not args.overwrite:
         check_if_exists('merged.dmp')
+    print('Writing relevant ids to merged.dmp ...')
     write_merged(merged, args.tids)
 
     # Update taxa ids, replacing the merged ones.
     tids = [merged.get(tid, tid) for tid in args.tids]
 
-    # Nodes content, and needed taxa ids.
+    # Nodes and needed taxa ids.
+    print('Reading all nodes...')
     nodes, children = read_nodes(tar)
     needed = find_needed(nodes, children, tids)
+
+    print('Writing nodes with needed ids to nodes.dmp ...')
     if not args.overwrite:
         check_if_exists('nodes.dmp')
     write_nodes(nodes, needed)
 
-    # Names corresponding to taxa ids.
+    # Names.
+    print('Reading all names...')
     names = read_names(tar)
+
     if not args.overwrite:
         check_if_exists('names.dmp')
+    print('Writing names with needed ids to names.dmp ...')
     write_names(names, needed)
 
-    # Final small taxa dump.
+    # Final taxa dump (a smaller file than the original full taxa dump).
     if not args.overwrite:
         check_if_exists(args.dest)
-    create_tar(args.dest)
-    print('Done. You can remove nodes.dmp names.dmp merged.dmp if you want.')
+    print(f'Creating {args.dest} ...')
+    os.system(f'tar -vczf "{args.dest}" merged.dmp nodes.dmp names.dmp')
+
+    print('Done. You can safely remove: merged.dmp nodes.dmp names.dmp')
 
     # If we want to create the sqlite file from it, we would do:
     #   from ete4.ncbi_taxonomy import ncbiquery
@@ -74,8 +88,10 @@ def get_args():
 
 def read_merged(tar):
     """Read merged.dmp and return its contents as a dict."""
-    print('Reading merged...')
-    merged = {}
+    # The lines look like:
+    # 42099	|	907947	|
+
+    merged = {}  # will look like  merged['42099'] = '907947'
     for line in tar.extractfile('merged.dmp'):
         old, new, _ = [x.strip() for x in line.decode().split('|')]
         merged[old] = new
@@ -85,7 +101,6 @@ def read_merged(tar):
 
 def write_merged(merged, tids):
     """Write merged.dmp with only the relevant taxa ids."""
-    print('Writing merged.dmp ...')
     with open('merged.dmp', 'wt') as fmerged:
         for tid in tids:
             if tid in merged:
@@ -94,12 +109,14 @@ def write_merged(merged, tids):
 
 def read_nodes(tar):
     """Read nodes.dmp, return it as a dict, and a dict from id to children."""
-    print('Reading nodes...')
-    nodes = {}
-    children = {}
+    # The lines look like:
+    # 678	|	2614977	|	species	|	...	|
+
+    nodes = {}  # will look like  nodes['678'] = ['2614977', 'species', ...]
+    children = {}  # will look like  children['2614977'] = {'678', ...}
     for line in tar.extractfile('nodes.dmp'):
         tid, ptid, *rest = [x.strip() for x in line.decode().split('|')]
-        nodes[tid] = [ptid] + rest[:-1]
+        nodes[tid] = [ptid] + rest[:-1]  # there's nothing after the last "|"
         if ptid:  # parent taxa id
             children.setdefault(ptid, set()).add(tid)
 
@@ -130,7 +147,6 @@ def find_needed(nodes, children, tids):
 
 def write_nodes(nodes, needed):
     """Write nodes.dmp with only the needed taxa ids."""
-    print('Writing nodes.dmp ...')
     with open('nodes.dmp', 'wt') as fnodes:
         for tid in needed:
             fnodes.write('\t|\t'.join([tid] + nodes[tid]) + '\t|\n')
@@ -138,28 +154,24 @@ def write_nodes(nodes, needed):
 
 def read_names(tar):
     """Read names.dmp and return its contents as a dict."""
-    print('Reading names...')
-    names = {}
+    # Each taxa id can have several entries. The lines look like:
+    # 9606	|	human	|		|	genbank common name	|
+    # 9606	|	Homo sapiens	|		|	scientific name	|
+
+    names = {}  # will look like  names['9606'] = [['human', ...], ['Homo sapiens', ...], ...]
     for line in tar.extractfile('names.dmp'):
         tid, *rest = [x.strip() for x in line.decode().split('|')]
-        names.setdefault(tid, []).append(rest[:-1])
+        names.setdefault(tid, []).append(rest[:-1])  # nothing after last "|"
 
     return names
 
 
 def write_names(names, needed):
     """Write names.dmp with only the needed taxa ids."""
-    print('Writing names.dmp ...')
     with open('names.dmp', 'wt') as fnames:
         for tid in needed:
             for results in names[tid]:
                 fnames.write('\t|\t'.join([tid] + results) + '\t|\n')
-
-
-def create_tar(fname):
-    """Put it all in the given filename."""
-    print(f'Creating {fname} ...')
-    os.system(f'tar -vczf {fname} merged.dmp nodes.dmp names.dmp')
 
 
 def check_if_exists(fname):
