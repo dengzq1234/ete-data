@@ -87,17 +87,20 @@ def get_args():
     return parser.parse_args()
 
 
+def extract(tar, fname):
+    """Yield fields extracted from file fname in the tar file."""
+    # The lines look like:
+    # x0	|	x1	|	...	|	xn	|
+    for line in tar.extractfile(fname):
+        yield [x.strip() for x in line.decode().split('|')[:-1]]
+        # The  [:-1]  is because there is nothing after the last "|"
+
+
 def read_merged(tar):
     """Read merged.dmp and return its contents as a dict."""
     # The lines look like:
     # 42099	|	907947	|
-
-    merged = {}  # will look like  merged['42099'] = '907947'
-    for line in tar.extractfile('merged.dmp'):
-        old, new, _ = [x.strip() for x in line.decode().split('|')]
-        merged[old] = new
-
-    return merged
+    return dict(extract(tar, 'merged.dmp'))  # like  {'42099': '907947', ...}
 
 
 def write_merged(merged, tids):
@@ -115,9 +118,8 @@ def read_nodes(tar):
 
     nodes = {}  # will look like  nodes['678'] = ['2614977', 'species', ...]
     children = {}  # will look like  children['2614977'] = {'678', ...}
-    for line in tar.extractfile('nodes.dmp'):
-        tid, ptid, *rest = [x.strip() for x in line.decode().split('|')]
-        nodes[tid] = [ptid] + rest[:-1]  # there's nothing after the last "|"
+    for tid, ptid, *rest in extract(tar, 'nodes.dmp'):
+        nodes[tid] = [ptid] + rest
         if ptid:  # parent taxa id
             children.setdefault(ptid, set()).add(tid)
 
@@ -158,9 +160,8 @@ def read_names(tar):
     # 9606	|	Homo sapiens	|		|	scientific name	|
 
     names = {}  # will look like  names['9606'] = [['human', ...], ['Homo sapiens', ...], ...]
-    for line in tar.extractfile('names.dmp'):
-        tid, *rest = [x.strip() for x in line.decode().split('|')]
-        names.setdefault(tid, []).append(rest[:-1])  # nothing after last "|"
+    for tid, *rest in extract(tar, 'names.dmp'):
+        names.setdefault(tid, []).append(rest)
 
     return names
 
