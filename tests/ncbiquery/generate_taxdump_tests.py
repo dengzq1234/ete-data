@@ -41,6 +41,7 @@ def main():
     # Nodes and needed taxa ids.
     print('Reading all nodes...')
     nodes, children = read_nodes(tar)
+
     needed = find_needed(nodes, children, tids)
 
     print('Writing nodes with needed ids to nodes.dmp ...')
