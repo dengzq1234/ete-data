@@ -24,7 +24,8 @@ def main():
     print('Using full taxdump file:', args.src)
     tar = tarfile.open(args.src)
 
-    print('Taxa ids to include:', ' '.join(args.tids))
+    tids_to_include = args.tids or open('taxa_ids.txt').read().split()
+    print('Taxa ids to include:', ' '.join(tids_to_include))
 
     # Merged taxa ids.
     print('Reading all merged ids...')
@@ -33,10 +34,10 @@ def main():
     if not args.overwrite:
         check_if_exists('merged.dmp')
     print('Writing relevant ids to merged.dmp ...')
-    write_merged(merged, args.tids)
+    write_merged(merged, tids_to_include)
 
     # Update taxa ids, replacing the merged ones.
-    tids = [merged.get(tid, tid) for tid in args.tids]
+    tids = [merged.get(tid, tid) for tid in tids_to_include]
 
     # Nodes and needed taxa ids.
     print('Reading all nodes...')
@@ -79,9 +80,7 @@ def get_args():
 
     add('--src', default='taxdump.tar.gz', help='source file (full NCBI dump)')
     add('--dest', default='taxdump_tests.tar.gz', help='destination file')
-    add('--tids', metavar='ID', nargs='+', help='taxa ids to include',
-        default=['9604', '9605', '9606', '649756', '7507', '678',
-                 '42099', '9443', '9598', '10090'])
+    add('--tids', metavar='ID', nargs='+', help='taxa ids to include (or read taxa_ids.txt)')
     add('--overwrite', action='store_true', help='overwrite files (skip checks)')
 
     return parser.parse_args()
