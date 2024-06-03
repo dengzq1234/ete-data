@@ -35,7 +35,7 @@ tar -czf gtdb_latest_dump.tar.gz *.dmp
 
 Let's download release 207 as an example:
 
-```
+```sh
 wget https://github.com/etetoolkit/ete-data/raw/main/gtdb_taxonomy/gtdb207/gtdb207dump.tar.gz
 ```
 
