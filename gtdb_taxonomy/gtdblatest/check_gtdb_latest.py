@@ -13,6 +13,8 @@ import re
 import hashlib
 import requests
 
+URL_MD5SUM = 'https://data.gtdb.ecogenomic.org/releases/latest/MD5SUM.txt'
+
 
 def main():
     names = ['bac120_taxonomy', 'ar53_taxonomy']
@@ -20,14 +22,14 @@ def main():
     print('Checking status of', names, '...')
 
     try:
-        md5s_web = get_md5s()
+        name_to_md5 = get_name_to_md5(URL_MD5SUM)
         # The names they put in their files don't necessarily
-        # corrspond to the actual files! For example, they can mention
+        # correspond to the actual files! For example, they can mention
         # ar53_taxonomy_r220.tsv.gz when the real downloadable file is
         # ar53_taxonomy.tsv.gz
 
         for name in names:
-            md5_web = get_md5_web(md5s_web, name)
+            md5_web = get_md5(name_to_md5, name)
             assert md5_web, f'Cannot find mention of file for {name}'
 
             md5 = hashlib.md5(open(name + '.tsv.gz', 'rb').read()).hexdigest()
@@ -39,15 +41,16 @@ def main():
         sys.exit(f'Cannot check status: {e}')
 
 
-def get_md5s(url='https://data.gtdb.ecogenomic.org/releases/latest/MD5SUM.txt'):
+def get_name_to_md5(url):
     """Return a dict like {fname: md5} from parsing the given url."""
     parts = [line.split() for line in requests.get(url).text.splitlines()]
     return {fname.lstrip('./'): md5 for md5, fname in parts}
 
 
-def get_md5_web(md5s_web, name):
-    pattern = name + r'.*\.tsv\.gz'
-    for web_name, md5 in md5s_web.items():
+def get_md5(name_to_md5, name):
+    """Return the md5 that corresponds to the given name."""
+    pattern = name + r'.*\.tsv\.gz'  # name, maybe something, .tsv.gz
+    for web_name, md5 in name_to_md5.items():
         if re.match(pattern, web_name):
             return md5
     return None
