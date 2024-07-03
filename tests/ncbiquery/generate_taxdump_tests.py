@@ -24,7 +24,7 @@ def main():
     print('Using full taxdump file:', args.src)
     tar = tarfile.open(args.src)
 
-    tids_to_include = args.tids or open('taxa_ids.txt').read().split()
+    tids_to_include = args.tids or open('taxa_ids.txt').read().strip().split()
     print('Taxa ids to include:', ' '.join(tids_to_include))
 
     # Merged taxa ids.
@@ -80,7 +80,7 @@ def get_args():
 
     add('--src', default='taxdump.tar.gz', help='source file (full NCBI dump)')
     add('--dest', default='taxdump_tests.tar.gz', help='destination file')
-    add('--tids', metavar='ID', nargs='+', help='taxa ids to include (or read taxa_ids.txt)')
+    add('--tids', metavar='ID', nargs='+', help='taxa ids to include (otherwise read them from taxa_ids.txt)')
     add('--overwrite', action='store_true', help='overwrite files (skip checks)')
 
     return parser.parse_args()
