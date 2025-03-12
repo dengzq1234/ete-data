@@ -14,7 +14,7 @@ import requests
 
 
 def main():
-    fnames = ['bac120_taxonomy.tsv.gz', 'ar53_taxonomy.tsv.gz']
+    fnames = ['./bac120_taxonomy.tsv.gz', './ar53_taxonomy.tsv.gz']
 
     print('Checking status of files', fnames, '...')
 
